@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTS15 Stats Converter - PLS ARG Modding Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#E5BE53',
+                            goldHover: '#D4A838',
+                            goldLight: '#F3D77E',
+                            sky: '#81BBE6',
+                            skyLight: '#A8D3F2',
+                            blue: '#1653A3',
+                            blueDark: '#0F3C7A',
+                            black: '#0A0A0C',
+                            darkCard: '#121318',
+                            darkInput: '#181A20',
+                            darkBorder: '#262932'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Ocultar flechas en inputs numéricos */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        /* Scrollbar elegante */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #81BBE655;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #E5BE53;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-brand-black dark:text-slate-100 min-h-screen font-sans transition-colors duration-200 flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white dark:bg-brand-darkCard border-b border-slate-200 dark:border-brand-darkBorder py-3.5 px-6 shadow-sm sticky top-0 z-30">
+        <div class="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <!-- Identidad / Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-blue via-brand-sky to-brand-gold p-0.5 shadow-md shrink-0">
+                    <div class="w-full h-full rounded-full bg-white dark:bg-brand-black flex items-center justify-center font-black text-xs tracking-tighter text-brand-blue dark:text-brand-gold">
+                        PLS<span class="text-brand-sky">ARG</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-xl font-bold tracking-tight text-brand-blue dark:text-brand-gold">FTS15 Stats Converter</h1>
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-brand-sky/20 text-brand-blue dark:text-brand-sky border border-brand-sky/30">
+                            ★★★ Ed. Oficial
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Conversor de atributos (FC27 / eFootball 2027 / PES 2021 / Football Manager → First Touch Soccer 15)</p>
+                </div>
+            </div>
+
+            <!-- Controles globales y tema -->
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Botón Cambio Tema Claro / Oscuro -->
+                <button onclick="toggleTheme()" id="themeToggleBtn" title="Cambiar entre Modo Oscuro (Negro) y Modo Claro"
+                    class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-brand-darkInput dark:hover:bg-slate-800 text-slate-700 dark:text-brand-gold text-xs font-semibold py-2 px-3 rounded-lg border border-slate-300 dark:border-brand-darkBorder transition">
+                    <span id="themeIcon">☀️</span>
+                    <span id="themeLabel">Tema Claro</span>
+                </button>
+
+                <label class="bg-brand-blue hover:bg-brand-blueDark dark:bg-brand-gold dark:hover:bg-brand-goldHover text-white dark:text-brand-black text-xs font-bold py-2 px-3.5 rounded-lg shadow cursor-pointer transition">
+                    Importar Ficha (.json)
+                    <input type="file" id="importSinglePlayerInput" accept=".json" class="hidden" onchange="importSinglePlayerJson(event)">
+                </label>
+
+                <button onclick="exportDatabase()" class="bg-slate-100 hover:bg-slate-200 dark:bg-brand-darkInput dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium py-2 px-3 rounded-lg border border-slate-300 dark:border-brand-darkBorder transition">
+                    Respaldar Base
+                </button>
+
+                <label class="bg-slate-100 hover:bg-slate-200 dark:bg-brand-darkInput dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium py-2 px-3 rounded-lg border border-slate-300 dark:border-brand-darkBorder cursor-pointer transition">
+                    Cargar Base
+                    <input type="file" id="importJsonInput" accept=".json" class="hidden" onchange="importDatabase(event)">
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <!-- Layout Principal con Barra Lateral -->
+    <div class="max-w-[1440px] w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
+        
+        <!-- BARRA LATERAL IZQUIERDA: Redes y Comunidad (2 columnas en desktop) -->
+        <aside class="lg:col-span-2 flex flex-col gap-5">
+            <!-- Mis Redes -->
+            <div class="bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-4 shadow-sm">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-brand-blue dark:text-brand-gold mb-3 flex items-center gap-1.5">
+                    <span>★</span> Mis Canales
+                </h2>
+                <nav class="flex flex-col gap-2">
+                    <a href="https://kitsparaplsypksbykitsplsargentina.blogspot.com/?m=1" target="_blank" rel="noopener noreferrer"
+                        class="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium bg-slate-50 hover:bg-brand-sky/15 dark:bg-brand-darkInput dark:hover:bg-brand-gold/15 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-brand-darkBorder transition">
+                        <span class="w-2 h-2 rounded-full bg-brand-gold group-hover:scale-125 transition"></span>
+                        <span class="truncate">Mi Blog de kits</span>
+                    </a>
+                    <a href="https://www.youtube.com/@kitsplsargentina" target="_blank" rel="noopener noreferrer"
+                        class="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium bg-slate-50 hover:bg-brand-sky/15 dark:bg-brand-darkInput dark:hover:bg-brand-gold/15 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-brand-darkBorder transition">
+                        <span class="w-2 h-2 rounded-full bg-brand-sky group-hover:scale-125 transition"></span>
+                        <span class="truncate">Canal de YouTube</span>
+                    </a>
+                    <a href="https://www.facebook.com/p/Kits-PLS-Argentina-100063734421389/" target="_blank" rel="noopener noreferrer"
+                        class="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium bg-slate-50 hover:bg-brand-sky/15 dark:bg-brand-darkInput dark:hover:bg-brand-gold/15 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-brand-darkBorder transition">
+                        <span class="w-2 h-2 rounded-full bg-brand-blue group-hover:scale-125 transition"></span>
+                        <span class="truncate">Página de Facebook</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Colaboradores y Amigos de la Comunidad -->
+            <div class="bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-4 shadow-sm">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-brand-blue dark:text-brand-sky mb-3 flex items-center gap-1.5">
+                    <span>🤝</span> Comunidad & Amigos
+                </h2>
+                <nav class="flex flex-col gap-2" id="communityLinksList">
+                    <a href="https://ftsperu.blogspot.com/" target="_blank" rel="noopener noreferrer"
+                        class="flex items-center justify-between px-3 py-2 rounded-lg text-xs bg-slate-50 hover:bg-brand-blue/10 dark:bg-brand-darkInput dark:hover:bg-brand-sky/10 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-brand-darkBorder transition">
+                        <span class="truncate font-medium">FTS Perú</span>
+                        <span class="text-[10px] text-brand-blue dark:text-brand-gold">↗</span>
+                    </a>
+                    <a href="https://www.facebook.com/droicer" target="_blank" rel="noopener noreferrer"
+                        class="flex items-center justify-between px-3 py-2 rounded-lg text-xs bg-slate-50 hover:bg-brand-blue/10 dark:bg-brand-darkInput dark:hover:bg-brand-sky/10 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-brand-darkBorder transition">
+                        <span class="truncate font-medium">Droicer</span>
+                        <span class="text-[10px] text-brand-blue dark:text-brand-gold">↗</span>
+                    </a>
+                    <a href="https://www.youtube.com/@GIIODROID" target="_blank" rel="noopener noreferrer"
+                        class="flex items-center justify-between px-3 py-2 rounded-lg text-xs bg-slate-50 hover:bg-brand-blue/10 dark:bg-brand-darkInput dark:hover:bg-brand-sky/10 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-brand-darkBorder transition">
+                        <span class="truncate font-medium">Giodroid</span>
+                        <span class="text-[10px] text-brand-blue dark:text-brand-gold">↗</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Guía de Uso y Bookmarklets -->
+            <div class="bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-4 shadow-sm">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-brand-blue dark:text-brand-gold mb-2.5 flex items-center gap-1.5">
+                    <span>📖</span> Ayuda & Scripts
+                </h2>
+                <a href="guia.html"
+                    class="flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold bg-brand-blue/10 hover:bg-brand-blue/20 dark:bg-brand-gold/15 dark:hover:bg-brand-gold/25 text-brand-blue dark:text-brand-gold border border-brand-blue/30 dark:border-brand-gold/30 transition">
+                    <span class="truncate">Guía & Bookmarklets</span>
+                    <span class="text-xs">→</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- COLUMNA CENTRAL: Formulario de Ingreso (6 columnas) -->
+        <section class="lg:col-span-6 bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-5 shadow-sm">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-brand-darkBorder">
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white" id="formTitle">Nuevo Jugador</h2>
+                <button type="button" onclick="resetForm()" class="text-xs font-medium text-brand-blue dark:text-brand-sky hover:underline">
+                    Limpiar formulario
+                </button>
+            </div>
+
+            <form id="converterForm" onsubmit="handleSavePlayer(event)">
+                <input type="hidden" id="editPlayerId" value="">
+
+                <!-- Datos Básicos -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Nombre del Jugador *</label>
+                        <input type="text" id="playerName" required placeholder="Ej: Lionel Messi" oninput="calculatePreview()"
+                            class="w-full bg-slate-50 dark:bg-brand-darkInput border border-slate-300 dark:border-brand-darkBorder rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue dark:focus:border-brand-gold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Posición Principal *</label>
+                        <select id="playerPosition" onchange="toggleGoalkeeperFields(); calculatePreview();" 
+                            class="w-full bg-slate-50 dark:bg-brand-darkInput border border-slate-300 dark:border-brand-darkBorder rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue dark:focus:border-brand-gold">
+                            <option value="Delantero (DC/ED/EI)">Delantero (FWD)</option>
+                            <option value="Mediocampista (MC/MCO/MCD)">Mediocampista (MID)</option>
+                            <option value="Defensor (DFC/LD/LI)">Defensor (DEF)</option>
+                            <option value="Arquero (POR)">Arquero (GK)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Carpeta / Equipo (Organización Jerárquica) -->
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            Carpeta / Equipo (separar niveles con <code class="text-brand-blue dark:text-brand-gold">/</code>)
+                        </label>
+                        <span class="text-[11px] text-slate-400 dark:text-slate-500">Para descarga en .ZIP</span>
+                    </div>
+                    <input type="text" id="playerFolder" list="folderSuggestions" 
+                        placeholder="Ej: Argentina/Promocional Amateur/Academia Control Orientado"
+                        class="w-full bg-slate-50 dark:bg-brand-darkInput border border-slate-300 dark:border-brand-darkBorder rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue dark:focus:border-brand-gold">
+                    <datalist id="folderSuggestions"></datalist>
+                </div>
+
+                <!-- Selección de Fuente, Modo de Escala y Versión -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Juego de Origen</label>
+                        <select id="sourceGame" onchange="renderSourceInputs(); calculatePreview();" 
+                            class="w-full bg-slate-50 dark:bg-brand-darkInput border border-slate-300 dark:border-brand-darkBorder rounded-lg px-2.5 py-2 text-xs text-brand-blue dark:text-brand-gold font-semibold focus:outline-none focus:border-brand-blue dark:focus:border-brand-gold">
+                            <option value="FC27">FC27 / SoFIFA (0-99)</option>
+                            <option value="EFOOTBALL27">eFootball 2027 (40-99)</option>
+                            <option value="PES2021">PES 2021 (0-99)</option>
+                            <option value="FM">Football Manager (0-99)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" title="Elige si quieres mantener los stats puros o compensarlos para que el Global dentro de FTS15 coincida con la carta original">Modo de Escala</label>
+                        <select id="scaleMode" onchange="calculatePreview()" 
+                            class="w-full bg-slate-50 dark:bg-brand-darkInput border border-slate-300 dark:border-brand-darkBorder rounded-lg px-2.5 py-2 text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-brand-blue dark:focus:border-brand-gold">
+                            <option value="REALISTIC">Simulación Realista (Puro)</option>
+                            <option value="EQUIVALENT">Media Equivalente (FTS15 +)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Versión / DB (Opcional)</label>
+                        <input type="text" id="sourceVersion" placeholder="Ej: FC27 Nov 2026" oninput="calculatePreview()"
+                            class="w-full bg-slate-50 dark:bg-brand-darkInput border border-slate-300 dark:border-brand-darkBorder rounded-lg px-2.5 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue dark:focus:border-brand-gold">
+                    </div>
+                </div>
+
+                <!-- Contenedor Dinámico de Atributos del Juego de Origen -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Atributos de Origen (0-99)</span>
+                        <span class="text-[11px] text-slate-400 dark:text-slate-500">Usa TAB para avanzar rápido</span>
+                    </div>
+                    <div id="dynamicInputsContainer" class="space-y-4 max-h-[390px] overflow-y-auto pr-2">
+                        <!-- Se llena vía JS -->
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="flex flex-wrap gap-3 pt-4 border-t border-slate-200 dark:border-brand-darkBorder">
+                    <button type="submit" class="flex-1 bg-brand-blue hover:bg-brand-blueDark dark:bg-brand-gold dark:hover:bg-brand-goldHover text-white dark:text-brand-black font-bold py-2.5 px-4 rounded-lg shadow transition">
+                        Guardar y Descargar .TXT
+                    </button>
+                    <button type="button" onclick="saveOnly()" class="bg-slate-200 hover:bg-slate-300 dark:bg-brand-darkInput dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg border border-slate-300 dark:border-brand-darkBorder transition">
+                        Solo Guardar en Carpeta
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- COLUMNA DERECHA: Vista Previa FTS15 + Explorador de Carpetas (4 columnas) -->
+        <section class="lg:col-span-4 flex flex-col gap-6">
+            
+            <!-- Vista Previa en Tiempo Real -->
+            <div class="bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-5 shadow-sm">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 dark:border-brand-darkBorder">
+                    <h2 class="text-base font-bold text-brand-blue dark:text-brand-gold">Vista Previa FTS15</h2>
+                    <button type="button" onclick="downloadCurrentTxt()" class="bg-brand-sky/20 hover:bg-brand-sky/30 dark:bg-brand-gold/15 dark:hover:bg-brand-gold/25 text-brand-blue dark:text-brand-gold border border-brand-sky/40 dark:border-brand-gold/40 text-xs font-semibold py-1 px-3 rounded-md transition">
+                        Descargar .TXT
+                    </button>
+                </div>
+                <pre id="ftsPreviewBox" class="bg-slate-900 dark:bg-brand-black text-brand-skyLight dark:text-brand-goldLight font-mono text-xs p-4 rounded-lg border border-slate-300 dark:border-brand-darkBorder overflow-x-auto leading-relaxed"></pre>
+            </div>
+
+            <!-- Explorador de Carpetas y Equipos -->
+            <div class="bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-5 shadow-sm flex-1 flex flex-col">
+                <div class="flex justify-between items-center mb-3 gap-2">
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">
+                        Carpetas & Equipos (<span id="historyCount" class="text-brand-blue dark:text-brand-gold">0</span>)
+                    </h2>
+                    <button type="button" onclick="downloadZipByPath('')" id="downloadAllZipBtn" title="Descargar toda la base en un único ZIP ordenado por carpetas"
+                        class="bg-brand-blue/15 hover:bg-brand-blue/25 dark:bg-brand-gold/20 dark:hover:bg-brand-gold/30 text-brand-blue dark:text-brand-gold border border-brand-blue/30 dark:border-brand-gold/30 text-[11px] font-bold py-1 px-2.5 rounded-md transition">
+                        📦 Todo (.ZIP)
+                    </button>
+                </div>
+                
+                <div class="flex gap-2 mb-3">
+                    <input type="text" id="searchHistory" onkeyup="renderHistory()" placeholder="Buscar jugador o carpeta..." 
+                        class="flex-1 bg-slate-50 dark:bg-brand-darkInput border border-slate-300 dark:border-brand-darkBorder rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue dark:focus:border-brand-gold">
+                    <button type="button" onclick="promptNewEmptyFolder()" title="Crear una carpeta vacía"
+                        class="bg-slate-100 hover:bg-slate-200 dark:bg-brand-darkInput dark:hover:bg-slate-800 text-slate-700 dark:text-brand-sky text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-brand-darkBorder transition shrink-0">
+                        + Carpeta
+                    </button>
+                </div>
+
+                <div id="historyTreeContainer" class="space-y-1.5 max-h-[420px] overflow-y-auto pr-1">
+                    <!-- Árbol de carpetas y jugadores -->
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        // Gestión de Tema (Oscuro Negro / Claro)
+        function initTheme() {
+            const savedTheme = localStorage.getItem('fts15_theme') || 'dark';
+            const htmlEl = document.documentElement;
+            if (savedTheme === 'dark') {
+                htmlEl.classList.add('dark');
+                updateThemeButton(true);
+            } else {
+                htmlEl.classList.remove('dark');
+                updateThemeButton(false);
+            }
+        }
+
+        function toggleTheme() {
+            const htmlEl = document.documentElement;
+            const isDark = htmlEl.classList.toggle('dark');
+            localStorage.setItem('fts15_theme', isDark ? 'dark' : 'light');
+            updateThemeButton(isDark);
+        }
+
+        function updateThemeButton(isDark) {
+            document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+            document.getElementById('themeLabel').textContent = isDark ? 'Tema Claro' : 'Tema Oscuro';
+        }
+
+        const GAME_SCHEMAS = {
+            FC27: [
+                { group: "Ofensiva", fields: [
+                    { id: "centros", label: "Centros" },
+                    { id: "definicion", label: "Definición" },
+                    { id: "cabeza", label: "Precisión cabeza" },
+                    { id: "pases_cortos", label: "Pases cortos" },
+                    { id: "voleas", label: "Voleas" }
+                ]},
+                { group: "Técnica", fields: [
+                    { id: "regates", label: "Regates" },
+                    { id: "efecto", label: "Efecto" },
+                    { id: "faltas", label: "Precisión faltas" },
+                    { id: "pases_largos", label: "Pases largos" },
+                    { id: "control", label: "Control del balón" }
+                ]},
+                { group: "Movimiento", fields: [
+                    { id: "aceleracion", label: "Aceleración" },
+                    { id: "velocidad", label: "Velocidad" },
+                    { id: "agilidad", label: "Agilidad" },
+                    { id: "reflejos_mov", label: "Reflejos" },
+                    { id: "equilibrio", label: "Equilibrio" }
+                ]},
+                { group: "Potencia", fields: [
+                    { id: "potencia_tiro", label: "Potencia" },
+                    { id: "salto", label: "Salto" },
+                    { id: "resistencia", label: "Resistencia" },
+                    { id: "fuerza", label: "Fuerza" },
+                    { id: "tiros_lejanos", label: "Tiros lejanos" }
+                ]},
+                { group: "Mentalidad", fields: [
+                    { id: "agresividad", label: "Agresividad" },
+                    { id: "intercepciones", label: "Intercep." },
+                    { id: "pos_ataque", label: "Pos. ataque" },
+                    { id: "vision", label: "Visión" },
+                    { id: "penaltis", label: "Penaltis" },
+                    { id: "compostura", label: "Compostura" }
+                ]},
+                { group: "Defensa", fields: [
+                    { id: "conciencia_def", label: "Conciencia def." },
+                    { id: "robos", label: "Robos" },
+                    { id: "entrada_agresiva", label: "Entrada agresiva" }
+                ]},
+                { group: "Portero", isGK: true, fields: [
+                    { id: "gk_estirada", label: "Estirada" },
+                    { id: "gk_paradas", label: "Paradas" },
+                    { id: "gk_saques", label: "Saques" },
+                    { id: "gk_colocacion", label: "Colocación" },
+                    { id: "gk_reflejos", label: "Reflejos (POR)" }
+                ]}
+            ],
+            EFOOTBALL27: [
+                { group: "Agresor (Ataque / Técnica)", fields: [
+                    { id: "actitud_ofensiva", label: "Actitud ofensiva" },
+                    { id: "control_balon", label: "Control de balón" },
+                    { id: "regate", label: "Regate" },
+                    { id: "conservacion", label: "Conservación del balón" },
+                    { id: "pase_raso", label: "Pase raso" },
+                    { id: "pase_bombeado", label: "Pase bombeado" },
+                    { id: "finalizacion", label: "Finalización" },
+                    { id: "cabeceo", label: "Cabeceo" },
+                    { id: "balon_parado", label: "Balón parado" },
+                    { id: "efecto", label: "Efecto" }
+                ]},
+                { group: "Defensa", fields: [
+                    { id: "actitud_defensiva", label: "Actitud defensiva" },
+                    { id: "compromiso_defensivo", label: "Compromiso defensivo" },
+                    { id: "entrada", label: "Entrada" },
+                    { id: "agresividad", label: "Agresividad" }
+                ]},
+                { group: "Atletismo", fields: [
+                    { id: "velocidad", label: "Velocidad" },
+                    { id: "aceleracion", label: "Aceleración" },
+                    { id: "potencia_tiro", label: "Potencia de tiro" },
+                    { id: "salto", label: "Salto" },
+                    { id: "contacto_fisico", label: "Contacto físico" },
+                    { id: "equilibrio", label: "Equilibrio" },
+                    { id: "resistencia", label: "Resistencia" }
+                ]},
+                { group: "Portero", isGK: true, fields: [
+                    { id: "gk_actitud", label: "Actitud de portero" },
+                    { id: "gk_atajar", label: "Atajar (PT)" },
+                    { id: "gk_desviar", label: "Desviar (PT)" },
+                    { id: "gk_reflejos", label: "Reflejos (PT)" },
+                    { id: "gk_cobertura", label: "Cobertura (PT)" }
+                ]}
+            ],
+            PES2021: [
+                { group: "Ataque", fields: [
+                    { id: "actitud_ofensiva", label: "Actitud ofensiva" },
+                    { id: "finalizacion", label: "Finalización" },
+                    { id: "potencia_tiro", label: "Potencia de tiro" },
+                    { id: "uso_pierna_mala", label: "Uso pierna mala" },
+                    { id: "prec_pierna_mala", label: "Prec. pierna mala" }
+                ]},
+                { group: "Regate", fields: [
+                    { id: "control_balon", label: "Control de balón" },
+                    { id: "regate", label: "Regate" },
+                    { id: "conservacion", label: "Conservación balón" },
+                    { id: "equilibrio", label: "Equilibrio" }
+                ]},
+                { group: "Defensa", fields: [
+                    { id: "cabeceo", label: "Cabeceo" },
+                    { id: "salto", label: "Salto" },
+                    { id: "actitud_defensiva", label: "Actitud defensiva" },
+                    { id: "recuperacion", label: "Recup. de balón" },
+                    { id: "agresividad", label: "Agresividad" }
+                ]},
+                { group: "Pases", fields: [
+                    { id: "pase_raso", label: "Pase raso" },
+                    { id: "pase_bombeado", label: "Pase bombeado" },
+                    { id: "balon_parado", label: "Balón parado" },
+                    { id: "efecto", label: "Efecto" }
+                ]},
+                { group: "Complexión", fields: [
+                    { id: "velocidad", label: "Velocidad" },
+                    { id: "aceleracion", label: "Aceleración" },
+                    { id: "contacto_fisico", label: "Contacto físico" },
+                    { id: "resistencia", label: "Resistencia" },
+                    { id: "regularidad", label: "Regularidad" },
+                    { id: "resist_lesiones", label: "Resist. a lesiones" }
+                ]},
+                { group: "Portero", isGK: true, fields: [
+                    { id: "gk_actitud", label: "Actitud de portero" },
+                    { id: "gk_atajar", label: "Atajar (PT)" },
+                    { id: "gk_despejar", label: "Despejar (PT)" },
+                    { id: "gk_reflejos", label: "Reflejos (PT)" },
+                    { id: "gk_cobertura", label: "Cobertura (PT)" }
+                ]}
+            ],
+            FM: [
+                { group: "Technical", fields: [
+                    { id: "crossing", label: "Crossing" },
+                    { id: "dribbling", label: "Dribbling" },
+                    { id: "finishing", label: "Finishing" },
+                    { id: "first_touch", label: "First Touch" },
+                    { id: "heading", label: "Heading" },
+                    { id: "long_shots", label: "Long Shots" },
+                    { id: "marking", label: "Marking" },
+                    { id: "passing", label: "Passing" },
+                    { id: "tackling", label: "Tackling" },
+                    { id: "technique", label: "Technique" }
+                ]},
+                { group: "Mental", fields: [
+                    { id: "aggression", label: "Aggression" },
+                    { id: "anticipation", label: "Anticipation" },
+                    { id: "bravery", label: "Bravery" },
+                    { id: "composure", label: "Composure" },
+                    { id: "concentration", label: "Concentration" },
+                    { id: "decisions", label: "Decisions" },
+                    { id: "determination", label: "Determination" },
+                    { id: "flair", label: "Flair" },
+                    { id: "leadership", label: "Leadership" },
+                    { id: "off_the_ball", label: "Off the Ball" },
+                    { id: "positioning", label: "Positioning" },
+                    { id: "teamwork", label: "Teamwork" },
+                    { id: "vision", label: "Vision" },
+                    { id: "work_rate", label: "Work Rate" }
+                ]},
+                { group: "Physical & Set Pieces", fields: [
+                    { id: "acceleration", label: "Acceleration" },
+                    { id: "agility", label: "Agility" },
+                    { id: "balance", label: "Balance" },
+                    { id: "jumping_reach", label: "Jumping Reach" },
+                    { id: "natural_fitness", label: "Natural Fitness" },
+                    { id: "pace", label: "Pace" },
+                    { id: "stamina", label: "Stamina" },
+                    { id: "strength", label: "Strength" },
+                    { id: "corners", label: "Corners" },
+                    { id: "free_kick", label: "Free Kick Taking" },
+                    { id: "long_throws", label: "Long Throws" },
+                    { id: "penalty_taking", label: "Penalty Taking" }
+                ]},
+                { group: "Goalkeeping", isGK: true, fields: [
+                    { id: "gk_aerial", label: "Aerial Reach" },
+                    { id: "gk_command", label: "Command of Area" },
+                    { id: "gk_comm", label: "Communication" },
+                    { id: "gk_eccentricity", label: "Eccentricity" },
+                    { id: "gk_first_touch", label: "First Touch (GK)" },
+                    { id: "gk_handling", label: "Handling" },
+                    { id: "gk_kicking", label: "Kicking" },
+                    { id: "gk_one_on_ones", label: "One on Ones" },
+                    { id: "gk_passing", label: "Passing (GK)" },
+                    { id: "gk_punching", label: "Punching" },
+                    { id: "gk_reflexes", label: "Reflexes" },
+                    { id: "gk_rushing", label: "Rushing Out" },
+                    { id: "gk_technique", label: "Technique (GK)" },
+                    { id: "gk_throwing", label: "Throwing" }
+                ]}
+            ]
+        };
+
+        let savedPlayers = JSON.parse(localStorage.getItem('fts15_converter_db') || '[]');
+        let customEmptyFolders = JSON.parse(localStorage.getItem('fts15_empty_folders') || '[]');
+        let collapsedFolders = JSON.parse(localStorage.getItem('fts15_collapsed_folders') || '{}');
+
+        function normalizeFolderPath(rawPath) {
+            if (!rawPath) return '';
+            return rawPath
+                .split('/')
+                .map(seg => seg.trim().replace(/[\\:*?"<>|]/g, '_'))
+                .filter(Boolean)
+                .join('/');
+        }
+
+        function clamp(val) {
+            const num = Math.round(val);
+            if (isNaN(num) || num < 1) return 1;
+            if (num > 99) return 99;
+            return num;
+        }
+
+        function renderSourceInputs(existingValues = {}) {
+            const source = document.getElementById('sourceGame').value;
+            const container = document.getElementById('dynamicInputsContainer');
+            const groups = GAME_SCHEMAS[source];
+            
+            container.innerHTML = groups.map(g => `
+                <div class="bg-slate-50 dark:bg-brand-darkInput/80 p-3 rounded-lg border border-slate-200 dark:border-brand-darkBorder ${g.isGK ? 'gk-section' : ''}">
+                    <h3 class="text-xs font-bold text-brand-blue dark:text-brand-sky mb-2">${g.group}</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                        ${g.fields.map(f => `
+                            <div>
+                                <label class="block text-[11px] text-slate-600 dark:text-slate-400 truncate" title="${f.label}">${f.label}</label>
+                                <input type="number" min="0" max="99" id="stat_${f.id}" 
+                                    value="${existingValues[f.id] !== undefined ? existingValues[f.id] : 50}"
+                                    oninput="calculatePreview()"
+                                    class="stat-input w-full bg-white dark:bg-brand-black border border-slate-300 dark:border-brand-darkBorder rounded px-2 py-1 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue dark:focus:border-brand-gold">
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            toggleGoalkeeperFields();
+        }
+
+        function toggleGoalkeeperFields() {
+            const pos = document.getElementById('playerPosition').value;
+            const isGK = pos.includes('Arquero');
+            document.querySelectorAll('.gk-section').forEach(el => {
+                el.style.opacity = isGK ? '1' : '0.45';
+            });
+        }
+
+        function getRawInputValues() {
+            const values = {};
+            document.querySelectorAll('.stat-input').forEach(input => {
+                const key = input.id.replace('stat_', '');
+                values[key] = parseFloat(input.value) || 0;
+            });
+            return values;
+        }
+
+        function estimateFTS15EngineGlobal(pos, fts) {
+            const isGK = pos.includes('Arquero');
+            if (isGK) {
+                return clamp(fts.gk_paradas * 0.36 + fts.gk_manejo * 0.32 + fts.gk_presencia * 0.24 + fts.potencia * 0.08);
+            }
+            // Motor real de FTS15 (independiente de la posición de campo):
+            // Promedio ponderado de los atributos ofensivos/técnicos/físicos principales
+            return clamp(
+                fts.control * 0.15 +
+                fts.pase * 0.14 +
+                fts.disparo * 0.14 +
+                fts.velocidad * 0.13 +
+                fts.aceleracion * 0.13 +
+                fts.cruce * 0.11 +
+                fts.potencia * 0.10 +
+                fts.resistencia * 0.10
+            );
+        }
+
+        function estimateSourceCardOverall(source, pos, s) {
+            const isGK = pos.includes('Arquero');
+            if (source === 'FM') {
+                if (isGK) {
+                    return clamp((s.gk_reflexes + s.gk_handling + s.gk_one_on_ones + s.gk_command + s.gk_aerial + s.agility + s.concentration + s.positioning) / 8);
+                }
+                // Estima la media de élite/carta FM según sus mejores atributos de rol (sin castigar físicos bajos de veteranos técnicos)
+                const attackAvg = (s.finishing + s.dribbling + s.first_touch + s.passing + s.vision + s.technique + s.decisions + s.composure + s.flair + s.off_the_ball) / 10;
+                const midAvg = (s.passing + s.vision + s.first_touch + s.dribbling + s.technique + s.decisions + s.composure + s.anticipation + s.crossing + s.teamwork) / 10;
+                const defAvg = (s.tackling + s.marking + s.positioning + s.heading + s.anticipation + s.concentration + s.strength + s.jumping_reach + s.composure + s.decisions) / 10;
+                return clamp(Math.max(attackAvg, midAvg, defAvg));
+            }
+            return null;
+        }
+
+        function convertToFTS15(source, pos, s, scaleMode = 'REALISTIC') {
+            const isGK = pos.includes('Arquero');
+            let fts = {};
+
+            if (source === 'FC27') {
+                fts.potencia = clamp(s.fuerza * 0.45 + s.potencia_tiro * 0.40 + s.salto * 0.15);
+                fts.resistencia = clamp(s.resistencia * 0.85 + s.agresividad * 0.15);
+                fts.velocidad = clamp(s.velocidad * 0.90 + s.agilidad * 0.10);
+                fts.aceleracion = clamp(s.aceleracion * 0.85 + s.agilidad * 0.15);
+                fts.control = clamp(s.control * 0.45 + s.regates * 0.35 + s.agilidad * 0.10 + s.compostura * 0.10);
+                fts.pase = clamp(s.pases_cortos * 0.50 + s.pases_largos * 0.30 + s.vision * 0.20);
+                fts.cruce = clamp(s.centros * 0.75 + s.efecto * 0.15 + s.pases_largos * 0.10);
+                fts.disparo = clamp(s.definicion * 0.50 + s.potencia_tiro * 0.25 + s.tiros_lejanos * 0.15 + s.voleas * 0.10);
+                fts.cabeza = clamp(s.cabeza * 0.70 + s.salto * 0.30);
+                fts.entrada = clamp(s.robos * 0.45 + s.entrada_agresiva * 0.30 + s.conciencia_def * 0.15 + s.intercepciones * 0.10);
+                fts.balon_parado = clamp(s.faltas * 0.55 + s.penaltis * 0.25 + s.efecto * 0.20);
+
+                if (isGK) {
+                    fts.gk_paradas = clamp(s.gk_reflejos * 0.55 + s.gk_estirada * 0.45);
+                    fts.gk_manejo = clamp(s.gk_paradas * 0.70 + s.gk_saques * 0.30);
+                    fts.gk_presencia = clamp(s.gk_colocacion * 0.70 + s.salto * 0.15 + s.fuerza * 0.15);
+                } else {
+                    fts.gk_paradas = 10; fts.gk_manejo = 10; fts.gk_presencia = 10;
+                }
+            } 
+            else if (source === 'EFOOTBALL27') {
+                fts.potencia = clamp(s.contacto_fisico * 0.45 + s.potencia_tiro * 0.40 + s.salto * 0.15);
+                fts.resistencia = clamp(s.resistencia * 0.85 + s.compromiso_defensivo * 0.15);
+                fts.velocidad = clamp(s.velocidad * 0.90 + s.equilibrio * 0.10);
+                fts.aceleracion = clamp(s.aceleracion * 0.85 + s.equilibrio * 0.15);
+                fts.control = clamp(s.control_balon * 0.45 + s.regate * 0.35 + s.conservacion * 0.20);
+                fts.pase = clamp(s.pase_raso * 0.55 + s.pase_bombeado * 0.35 + s.actitud_ofensiva * 0.10);
+                fts.cruce = clamp(s.pase_bombeado * 0.70 + s.efecto * 0.30);
+                fts.disparo = clamp(s.finalizacion * 0.55 + s.potencia_tiro * 0.25 + s.actitud_ofensiva * 0.20);
+                fts.cabeza = clamp(s.cabeceo * 0.70 + s.salto * 0.30);
+                fts.entrada = clamp(s.entrada * 0.45 + s.actitud_defensiva * 0.30 + s.compromiso_defensivo * 0.15 + s.agresividad * 0.10);
+                fts.balon_parado = clamp(s.balon_parado * 0.70 + s.efecto * 0.30);
+
+                if (isGK) {
+                    fts.gk_paradas = clamp(s.gk_reflejos * 0.55 + s.gk_desviar * 0.45);
+                    fts.gk_manejo = clamp(s.gk_atajar * 0.70 + s.gk_actitud * 0.30);
+                    fts.gk_presencia = clamp(s.gk_cobertura * 0.65 + s.gk_actitud * 0.20 + s.salto * 0.15);
+                } else {
+                    fts.gk_paradas = 10; fts.gk_manejo = 10; fts.gk_presencia = 10;
+                }
+            }
+            else if (source === 'PES2021') {
+                fts.potencia = clamp(s.contacto_fisico * 0.45 + s.potencia_tiro * 0.40 + s.salto * 0.15);
+                fts.resistencia = clamp(s.resistencia * 0.85 + s.resist_lesiones * 0.15);
+                fts.velocidad = clamp(s.velocidad * 0.90 + s.equilibrio * 0.10);
+                fts.aceleracion = clamp(s.aceleracion * 0.85 + s.equilibrio * 0.15);
+                fts.control = clamp(s.control_balon * 0.45 + s.regate * 0.35 + s.conservacion * 0.20);
+                fts.pase = clamp(s.pase_raso * 0.55 + s.pase_bombeado * 0.35 + s.actitud_ofensiva * 0.10);
+                fts.cruce = clamp(s.pase_bombeado * 0.70 + s.efecto * 0.30);
+                fts.disparo = clamp(s.finalizacion * 0.55 + s.potencia_tiro * 0.25 + s.actitud_ofensiva * 0.20);
+                fts.cabeza = clamp(s.cabeceo * 0.70 + s.salto * 0.30);
+                fts.entrada = clamp(s.recuperacion * 0.50 + s.actitud_defensiva * 0.35 + s.agresividad * 0.15);
+                fts.balon_parado = clamp(s.balon_parado * 0.70 + s.efecto * 0.30);
+
+                if (isGK) {
+                    fts.gk_paradas = clamp(s.gk_reflejos * 0.55 + s.gk_despejar * 0.45);
+                    fts.gk_manejo = clamp(s.gk_atajar * 0.70 + s.gk_actitud * 0.30);
+                    fts.gk_presencia = clamp(s.gk_cobertura * 0.65 + s.gk_actitud * 0.20 + s.salto * 0.15);
+                } else {
+                    fts.gk_paradas = 10; fts.gk_manejo = 10; fts.gk_presencia = 10;
+                }
+            } 
+            else if (source === 'FM') {
+                fts.potencia = clamp(s.strength * 0.55 + s.jumping_reach * 0.25 + s.long_shots * 0.20);
+                fts.resistencia = clamp(s.stamina * 0.75 + s.natural_fitness * 0.25);
+                fts.velocidad = clamp(s.pace * 0.90 + s.agility * 0.10);
+                fts.aceleracion = clamp(s.acceleration * 0.85 + s.agility * 0.15);
+                fts.control = clamp(s.first_touch * 0.40 + s.dribbling * 0.35 + s.technique * 0.15 + s.composure * 0.10);
+                fts.pase = clamp(s.passing * 0.60 + s.vision * 0.25 + s.decisions * 0.15);
+                fts.cruce = clamp(s.crossing * 0.80 + s.technique * 0.20);
+                fts.disparo = clamp(s.finishing * 0.55 + s.long_shots * 0.25 + s.composure * 0.20);
+                fts.cabeza = clamp(s.heading * 0.70 + s.jumping_reach * 0.30);
+                fts.entrada = clamp(s.tackling * 0.50 + s.marking * 0.30 + s.positioning * 0.20);
+                fts.balon_parado = clamp(s.free_kick * 0.45 + s.corners * 0.30 + s.penalty_taking * 0.25);
+
+                if (isGK) {
+                    fts.gk_paradas = clamp(s.gk_reflexes * 0.55 + s.gk_one_on_ones * 0.45);
+                    fts.gk_manejo = clamp(s.gk_handling * 0.65 + s.gk_kicking * 0.20 + s.gk_throwing * 0.15);
+                    fts.gk_presencia = clamp(s.gk_command * 0.45 + s.gk_aerial * 0.35 + s.gk_rushing * 0.20);
+                } else {
+                    fts.gk_paradas = 10; fts.gk_manejo = 10; fts.gk_presencia = 10;
+                }
+            }
+
+            if (scaleMode === 'EQUIVALENT') {
+                if (isGK) {
+                    fts.gk_paradas = clamp(fts.gk_paradas + 4);
+                    fts.gk_manejo = clamp(fts.gk_manejo + 4);
+                    fts.gk_presencia = clamp(fts.gk_presencia + 4);
+                    fts.potencia = clamp(fts.potencia + 3);
+                } else if (source === 'FM') {
+                    // En FM, veteranos técnicos (ej. Messi) tienen 95-99 en técnica/visión/pase pero 45-65 en físico.
+                    // Para que el motor promedio de FTS15 refleje su calidad real sin saturar en 99,
+                    // elevamos el piso mínimo de los atributos físicos/secundarios y escalamos hacia el objetivo de la carta.
+                    const targetOvr = estimateSourceCardOverall(source, pos, s);
+                    const floorBase = Math.max(55, Math.round(targetOvr * 0.76));
+                    fts.potencia = clamp(Math.max(fts.potencia + 14, floorBase));
+                    fts.resistencia = clamp(Math.max(fts.resistencia + 14, floorBase + 4));
+                    fts.velocidad = clamp(Math.max(fts.velocidad + 16, floorBase + 2));
+                    fts.aceleracion = clamp(Math.max(fts.aceleracion + 14, floorBase + 6));
+                    fts.control = clamp(fts.control + 4);
+                    fts.pase = clamp(fts.pase + 4);
+                    fts.cruce = clamp(fts.cruce + 6);
+                    fts.disparo = clamp(fts.disparo + 6);
+                    fts.cabeza = clamp(fts.cabeza + 6);
+                    fts.entrada = clamp(fts.entrada + 5);
+                    fts.balon_parado = clamp(fts.balon_parado + 4);
+
+                    // Bucle fino para que el Global estimado en FTS15 coincida exactamente con targetOvr
+                    let guard = 0;
+                    while (estimateFTS15EngineGlobal(pos, fts) < targetOvr && guard < 25) {
+                        const keys = ['disparo', 'cruce', 'aceleracion', 'resistencia', 'velocidad', 'potencia', 'control', 'pase'];
+                        for (const k of keys) {
+                            if (fts[k] < 99 && estimateFTS15EngineGlobal(pos, fts) < targetOvr) {
+                                fts[k] = clamp(fts[k] + 1);
+                            }
+                        }
+                        guard++;
+                    }
+                } else {
+                    // Ajuste para FC27 / eFootball / PES (donde los físicos y técnicos vienen más balanceados)
+                    const baseBoost = (source === 'EFOOTBALL27' || source === 'PES2021') ? 3 : 4;
+                    fts.disparo = clamp(fts.disparo + baseBoost + 1);
+                    fts.pase = clamp(fts.pase + baseBoost + 1);
+                    fts.cruce = clamp(fts.cruce + baseBoost + 1);
+                    fts.potencia = clamp(fts.potencia + baseBoost);
+                    fts.resistencia = clamp(fts.resistencia + baseBoost);
+                    fts.velocidad = clamp(fts.velocidad + baseBoost - 1);
+                    fts.aceleracion = clamp(fts.aceleracion + baseBoost - 1);
+                    fts.control = clamp(fts.control + baseBoost);
+                    fts.cabeza = clamp(fts.cabeza + baseBoost);
+                    fts.entrada = clamp(fts.entrada + baseBoost);
+                }
+            }
+
+            fts.global = estimateFTS15EngineGlobal(pos, fts);
+            return fts;
+        }
+
+        function formatTxtContent(name, pos, source, version, fts, scaleMode = 'REALISTIC') {
+            const modeTag = scaleMode === 'EQUIVALENT' ? 'Media Equivalente' : 'Simulación Realista';
+            const fuenteLabel = version ? `${source} (${version}) [${modeTag}]` : `${source} [${modeTag}]`;
+            return `Nombre: ${name || 'Sin Nombre'}
+Posición: ${pos}
+Fuente: ${fuenteLabel}
+
+Global: ${fts.global}
+Potencia: ${fts.potencia}
+Resistencia: ${fts.resistencia}
+Velocidad: ${fts.velocidad}
+Aceleración: ${fts.aceleracion}
+Control del balón: ${fts.control}
+Pase: ${fts.pase}
+Cruce: ${fts.cruce}
+Disparo: ${fts.disparo}
+Remate de cabeza: ${fts.cabeza}
+Entrada: ${fts.entrada}
+Jugadas a balón parado: ${fts.balon_parado}
+Paradas de portero: ${fts.gk_paradas}
+Manejo de portero: ${fts.gk_manejo}
+Presencia de portero: ${fts.gk_presencia}`;
+        }
+
+        function calculatePreview() {
+            const name = document.getElementById('playerName').value.trim();
+            const pos = document.getElementById('playerPosition').value;
+            const source = document.getElementById('sourceGame').value;
+            const scaleMode = document.getElementById('scaleMode').value;
+            const version = document.getElementById('sourceVersion').value.trim();
+            const rawStats = getRawInputValues();
+            const fts = convertToFTS15(source, pos, rawStats, scaleMode);
+
+            document.getElementById('ftsPreviewBox').textContent = formatTxtContent(name, pos, source, version, fts, scaleMode);
+        }
+
+        function triggerTxtDownload(playerName, content) {
+            const safeFileName = (playerName.trim() || 'Jugador_FTS15').replace(/[\\/:*?"<>|]/g, '_');
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${safeFileName}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadCurrentTxt() {
+            const name = document.getElementById('playerName').value.trim() || 'Jugador_FTS15';
+            const content = document.getElementById('ftsPreviewBox').textContent;
+            triggerTxtDownload(name, content);
+        }
+
+        function savePlayerData(downloadAfter = false) {
+            const name = document.getElementById('playerName').value.trim();
+            if (!name) {
+                alert('Por favor ingresa el nombre del jugador.');
+                return;
+            }
+            const pos = document.getElementById('playerPosition').value;
+            const folder = normalizeFolderPath(document.getElementById('playerFolder').value);
+            const source = document.getElementById('sourceGame').value;
+            const scaleMode = document.getElementById('scaleMode').value;
+            const version = document.getElementById('sourceVersion').value.trim();
+            const rawStats = getRawInputValues();
+            const ftsStats = convertToFTS15(source, pos, rawStats, scaleMode);
+            const editId = document.getElementById('editPlayerId').value;
+
+            const playerRecord = {
+                id: editId ? Number(editId) : Date.now(),
+                name,
+                pos,
+                folder,
+                source,
+                scaleMode,
+                version,
+                rawStats,
+                ftsStats,
+                updatedAt: new Date().toLocaleDateString()
+            };
+
+            if (editId) {
+                const idx = savedPlayers.findIndex(p => p.id === Number(editId));
+                if (idx !== -1) savedPlayers[idx] = playerRecord;
+            } else {
+                savedPlayers.unshift(playerRecord);
+            }
+
+            if (folder && !customEmptyFolders.includes(folder)) {
+                customEmptyFolders.push(folder);
+                localStorage.setItem('fts15_empty_folders', JSON.stringify(customEmptyFolders));
+            }
+
+            localStorage.setItem('fts15_converter_db', JSON.stringify(savedPlayers));
+            updateFolderSuggestions();
+            renderHistory();
+
+            if (downloadAfter) {
+                const txt = formatTxtContent(name, pos, source, version, ftsStats, scaleMode);
+                triggerTxtDownload(name, txt);
+            }
+
+            // Mantener la carpeta actual para cargar rápidamente al siguiente jugador del mismo equipo
+            resetForm(true);
+        }
+
+        function handleSavePlayer(e) {
+            e.preventDefault();
+            savePlayerData(true);
+        }
+
+        function saveOnly() {
+            savePlayerData(false);
+        }
+
+        function resetForm(keepFolder = false) {
+            document.getElementById('editPlayerId').value = '';
+            document.getElementById('formTitle').textContent = 'Nuevo Jugador';
+            document.getElementById('playerName').value = '';
+            if (!keepFolder) {
+                document.getElementById('playerFolder').value = '';
+            }
+            renderSourceInputs();
+            calculatePreview();
+        }
+
+        function selectFolderForInput(folderPath) {
+            document.getElementById('playerFolder').value = folderPath;
+            document.getElementById('playerName').focus();
+        }
+
+        function promptNewEmptyFolder() {
+            const input = prompt('Escribe la ruta de la nueva carpeta (usa / para subcarpetas):\nEjemplo: Argentina/Promocional Amateur/Academia Control Orientado');
+            if (!input) return;
+            const clean = normalizeFolderPath(input);
+            if (!clean) return;
+            if (!customEmptyFolders.includes(clean)) {
+                customEmptyFolders.push(clean);
+                localStorage.setItem('fts15_empty_folders', JSON.stringify(customEmptyFolders));
+            }
+            document.getElementById('playerFolder').value = clean;
+            updateFolderSuggestions();
+            renderHistory();
+        }
+
+        function updateFolderSuggestions() {
+            const allPaths = new Set(customEmptyFolders);
+            savedPlayers.forEach(p => {
+                if (p.folder) allPaths.add(normalizeFolderPath(p.folder));
+            });
+            const datalist = document.getElementById('folderSuggestions');
+            datalist.innerHTML = Array.from(allPaths).sort().map(path => `<option value="${path}">`).join('');
+        }
+
+        function loadPlayerForEdit(id) {
+            const player = savedPlayers.find(p => p.id === id);
+            if (!player) return;
+
+            document.getElementById('editPlayerId').value = player.id;
+            document.getElementById('formTitle').textContent = `Editando: ${player.name}`;
+            document.getElementById('playerName').value = player.name;
+            document.getElementById('playerPosition').value = player.pos;
+            document.getElementById('playerFolder').value = player.folder || '';
+            document.getElementById('sourceGame').value = player.source;
+            document.getElementById('scaleMode').value = player.scaleMode || 'REALISTIC';
+            document.getElementById('sourceVersion').value = player.version || '';
+
+            renderSourceInputs(player.rawStats);
+            calculatePreview();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function importSinglePlayerJson(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!data.rawStats || !data.source) {
+                        alert('Este archivo no corresponde a una ficha individual extraída.');
+                        return;
+                    }
+                    document.getElementById('editPlayerId').value = '';
+                    document.getElementById('formTitle').textContent = `Importado: ${data.name || 'Jugador'}`;
+                    document.getElementById('playerName').value = data.name || '';
+                    if (data.pos) document.getElementById('playerPosition').value = data.pos;
+                    if (data.folder) document.getElementById('playerFolder').value = normalizeFolderPath(data.folder);
+                    document.getElementById('sourceGame').value = data.source;
+                    document.getElementById('sourceVersion').value = data.version || '';
+
+                    renderSourceInputs(data.rawStats);
+                    calculatePreview();
+                } catch (err) {
+                    alert('Error al leer el archivo JSON de la ficha.');
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function downloadFromHistory(id) {
+            const player = savedPlayers.find(p => p.id === id);
+            if (!player) return;
+            const txt = formatTxtContent(player.name, player.pos, player.source, player.version, player.ftsStats, player.scaleMode || 'REALISTIC');
+            triggerTxtDownload(player.name, txt);
+        }
+
+        function deletePlayer(id) {
+            if (!confirm('¿Eliminar este jugador del historial?')) return;
+            savedPlayers = savedPlayers.filter(p => p.id !== id);
+            localStorage.setItem('fts15_converter_db', JSON.stringify(savedPlayers));
+            updateFolderSuggestions();
+            renderHistory();
+        }
+
+        function toggleFolderCollapse(path) {
+            collapsedFolders[path] = !collapsedFolders[path];
+            localStorage.setItem('fts15_collapsed_folders', JSON.stringify(collapsedFolders));
+            renderHistory();
+        }
+
+        function renameFolder(oldPath) {
+            const newRaw = prompt(`Renombrar o mover carpeta "${oldPath}" a:`, oldPath);
+            if (!newRaw) return;
+            const newPath = normalizeFolderPath(newRaw);
+            if (!newPath || newPath === oldPath) return;
+
+            savedPlayers.forEach(p => {
+                const f = normalizeFolderPath(p.folder || '');
+                if (f === oldPath) {
+                    p.folder = newPath;
+                } else if (f.startsWith(oldPath + '/')) {
+                    p.folder = newPath + f.slice(oldPath.length);
+                }
+            });
+
+            customEmptyFolders = customEmptyFolders.map(f => {
+                if (f === oldPath) return newPath;
+                if (f.startsWith(oldPath + '/')) return newPath + f.slice(oldPath.length);
+                return f;
+            });
+
+            localStorage.setItem('fts15_converter_db', JSON.stringify(savedPlayers));
+            localStorage.setItem('fts15_empty_folders', JSON.stringify(customEmptyFolders));
+            updateFolderSuggestions();
+            renderHistory();
+        }
+
+        function deleteFolder(targetPath) {
+            const playersInFolder = savedPlayers.filter(p => {
+                const f = normalizeFolderPath(p.folder || '');
+                return f === targetPath || f.startsWith(targetPath + '/');
+            });
+
+            if (playersInFolder.length === 0) {
+                if (!confirm(`¿Eliminar la carpeta vacía "${targetPath}"?`)) return;
+            } else {
+                const deletePlayersToo = confirm(
+                    `La carpeta "${targetPath}" contiene ${playersInFolder.length} jugador(es).\n\n` +
+                    `• Presiona ACEPTAR para eliminar la carpeta JUNTO CON todos sus jugadores y subcarpetas.\n` +
+                    `• Presiona CANCELAR si no deseas borrarla.`
+                );
+                if (!deletePlayersToo) return;
+
+                savedPlayers = savedPlayers.filter(p => {
+                    const f = normalizeFolderPath(p.folder || '');
+                    return !(f === targetPath || f.startsWith(targetPath + '/'));
+                });
+                localStorage.setItem('fts15_converter_db', JSON.stringify(savedPlayers));
+            }
+
+            customEmptyFolders = customEmptyFolders.filter(f => {
+                const norm = normalizeFolderPath(f);
+                return !(norm === targetPath || norm.startsWith(targetPath + '/'));
+            });
+            localStorage.setItem('fts15_empty_folders', JSON.stringify(customEmptyFolders));
+
+            if (normalizeFolderPath(document.getElementById('playerFolder').value).startsWith(targetPath)) {
+                document.getElementById('playerFolder').value = '';
+            }
+
+            updateFolderSuggestions();
+            renderHistory();
+        }
+
+        // Generar y descargar archivo .ZIP de una carpeta (o de toda la base si targetPath === '')
+        async function downloadZipByPath(targetPath) {
+            if (typeof JSZip === 'undefined') {
+                alert('La librería JSZip aún se está cargando o no hay conexión a internet.');
+                return;
+            }
+
+            const matchingPlayers = savedPlayers.filter(p => {
+                const pFolder = normalizeFolderPath(p.folder || '');
+                if (!targetPath) return true;
+                return pFolder === targetPath || pFolder.startsWith(targetPath + '/');
+            });
+
+            if (matchingPlayers.length === 0) {
+                alert('Esta carpeta no contiene jugadores para exportar.');
+                return;
+            }
+
+            const zip = new JSZip();
+            const rootName = targetPath ? targetPath.split('/').pop() : 'FTS15_Base_Completa';
+
+            matchingPlayers.forEach(p => {
+                const pFolder = normalizeFolderPath(p.folder || '');
+                const txtContent = formatTxtContent(p.name, p.pos, p.source, p.version, p.ftsStats, p.scaleMode || 'REALISTIC');
+                const safePlayerFile = `${(p.name.trim() || 'Jugador').replace(/[\\/:*?"<>|]/g, '_')}.txt`;
+
+                let relativeFolder = '';
+                if (!targetPath) {
+                    relativeFolder = pFolder || 'Sin_Carpeta';
+                } else if (pFolder.length > targetPath.length) {
+                    // Subcarpetas dentro de la carpeta descargada
+                    relativeFolder = pFolder.slice(targetPath.length + 1);
+                }
+
+                const fullZipPath = relativeFolder ? `${relativeFolder}/${safePlayerFile}` : safePlayerFile;
+                zip.file(fullZipPath, txtContent);
+            });
+
+            const blob = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${rootName.replace(/[\\/:*?"<>|]/g, '_')}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function buildFolderTree(players, emptyFolders, searchQuery) {
+            const root = { name: 'root', path: '', children: {}, players: [] };
+
+            function ensurePath(pathStr) {
+                if (!pathStr) return root;
+                const parts = pathStr.split('/');
+                let current = root;
+                let acc = '';
+                parts.forEach(part => {
+                    acc = acc ? `${acc}/${part}` : part;
+                    if (!current.children[part]) {
+                        current.children[part] = { name: part, path: acc, children: {}, players: [] };
+                    }
+                    current = current.children[part];
+                });
+                return current;
+            }
+
+            if (!searchQuery) {
+                emptyFolders.forEach(f => ensurePath(normalizeFolderPath(f)));
+            }
+
+            players.forEach(p => {
+                const folderPath = normalizeFolderPath(p.folder || '');
+                if (searchQuery) {
+                    const matchName = p.name.toLowerCase().includes(searchQuery);
+                    const matchFolder = folderPath.toLowerCase().includes(searchQuery);
+                    if (!matchName && !matchFolder) return;
+                }
+                const targetNode = ensurePath(folderPath);
+                targetNode.players.push(p);
+            });
+
+            return root;
+        }
+
+        function countNodePlayers(node) {
+            let total = node.players.length;
+            Object.values(node.children).forEach(child => {
+                total += countNodePlayers(child);
+            });
+            return total;
+        }
+
+        function renderTreeNode(node, depth = 0) {
+            let html = '';
+            const sortedChildKeys = Object.keys(node.children).sort((a, b) => a.localeCompare(b));
+
+            sortedChildKeys.forEach(key => {
+                const child = node.children[key];
+                const isCollapsed = !!collapsedFolders[child.path];
+                const totalInside = countNodePlayers(child);
+                const escapedPath = child.path.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+
+                html += `
+                    <div class="rounded-lg border border-slate-200/90 dark:border-brand-darkBorder bg-slate-50/70 dark:bg-brand-darkInput/50 overflow-hidden mb-1.5" style="margin-left: ${depth > 0 ? '10px' : '0px'}">
+                        <div class="flex items-center justify-between gap-1 px-2.5 py-1.5 bg-slate-100/90 dark:bg-brand-darkInput border-b border-slate-200/70 dark:border-brand-darkBorder/80">
+                            <button type="button" onclick="toggleFolderCollapse('${escapedPath}')" class="flex items-center gap-1.5 min-w-0 text-left flex-1 group">
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400">${isCollapsed ? '▶' : '▼'}</span>
+                                <span class="text-xs">📁</span>
+                                <span class="text-xs font-bold text-slate-800 dark:text-brand-sky truncate group-hover:text-brand-blue dark:group-hover:text-brand-gold transition" title="${child.path}">
+                                    ${child.name}
+                                </span>
+                                <span class="text-[10px] font-semibold px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-brand-black text-slate-600 dark:text-slate-300 shrink-0">
+                                    ${totalInside}
+                                </span>
+                            </button>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button type="button" onclick="selectFolderForInput('${escapedPath}')" title="Usar esta carpeta en el formulario"
+                                    class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition">
+                                    +
+                                </button>
+                                <button type="button" onclick="renameFolder('${escapedPath}')" title="Renombrar / Mover carpeta"
+                                    class="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
+                                    ✎
+                                </button>
+                                <button type="button" onclick="downloadZipByPath('${escapedPath}')" title="Descargar carpeta completa en .ZIP"
+                                    class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-blue hover:bg-brand-blueDark dark:bg-brand-gold dark:hover:bg-brand-goldHover text-white dark:text-brand-black transition">
+                                    .ZIP
+                                </button>
+                                <button type="button" onclick="deleteFolder('${escapedPath}')" title="Eliminar carpeta"
+                                    class="text-[10px] px-1.5 py-0.5 rounded bg-red-500/15 hover:bg-red-500/30 text-red-600 dark:text-red-400 transition">
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+                        ${!isCollapsed ? `<div class="p-1.5 space-y-1.5">${renderTreeNode(child, depth + 1)}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            node.players.forEach(p => {
+                html += renderPlayerCard(p);
+            });
+
+            return html;
+        }
+
+        function renderPlayerCard(p) {
+            return `
+                <div class="bg-white dark:bg-brand-black/80 border border-slate-200/80 dark:border-brand-darkBorder rounded-md p-2 flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5">
+                            <span class="bg-brand-blue/15 dark:bg-brand-gold/20 text-brand-blue dark:text-brand-gold font-bold text-[11px] px-1.5 py-0.5 rounded">${p.ftsStats.global}</span>
+                            <p class="text-xs font-semibold text-slate-900 dark:text-white truncate">${p.name}</p>
+                        </div>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">${p.pos} • ${p.source}</p>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="downloadFromHistory(${p.id})" title="Descargar .TXT individual" class="bg-brand-sky/20 hover:bg-brand-sky/35 dark:bg-brand-gold/20 dark:hover:bg-brand-gold/35 text-brand-blue dark:text-brand-gold font-semibold text-[11px] px-1.5 py-0.5 rounded transition">
+                            .TXT
+                        </button>
+                        <button onclick="loadPlayerForEdit(${p.id})" title="Editar jugador" class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[11px] px-1.5 py-0.5 rounded transition">
+                            Editar
+                        </button>
+                        <button onclick="deletePlayer(${p.id})" title="Eliminar" class="bg-red-500/15 hover:bg-red-500/30 text-red-600 dark:text-red-400 text-[11px] px-1.5 py-0.5 rounded transition">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHistory() {
+            const query = document.getElementById('searchHistory').value.trim().toLowerCase();
+            const container = document.getElementById('historyTreeContainer');
+            document.getElementById('historyCount').textContent = savedPlayers.length;
+
+            const tree = buildFolderTree(savedPlayers, customEmptyFolders, query);
+            const rendered = renderTreeNode(tree, 0);
+
+            if (!rendered.trim()) {
+                container.innerHTML = `<p class="text-xs text-slate-400 dark:text-slate-500 text-center py-6">No hay carpetas ni jugadores guardados aún.</p>`;
+                return;
+            }
+
+            container.innerHTML = rendered;
+        }
+
+        function exportDatabase() {
+            const backupPayload = {
+                version: 2,
+                exportedAt: new Date().toISOString(),
+                players: savedPlayers,
+                folders: customEmptyFolders
+            };
+            const dataStr = JSON.stringify(backupPayload, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `FTS15_Base_Carpetas_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importDatabase(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        // Compatibilidad con respaldos anteriores
+                        savedPlayers = imported;
+                    } else if (imported && Array.isArray(imported.players)) {
+                        savedPlayers = imported.players;
+                        if (Array.isArray(imported.folders)) {
+                            customEmptyFolders = imported.folders;
+                            localStorage.setItem('fts15_empty_folders', JSON.stringify(customEmptyFolders));
+                        }
+                    } else {
+                        alert('El archivo JSON no tiene un formato válido.');
+                        return;
+                    }
+                    localStorage.setItem('fts15_converter_db', JSON.stringify(savedPlayers));
+                    updateFolderSuggestions();
+                    renderHistory();
+                    alert(`Base importada con éxito (${savedPlayers.length} jugadores).`);
+                } catch (err) {
+                    alert('El archivo JSON no tiene un formato válido.');
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        initTheme();
+        updateFolderSuggestions();
+        renderSourceInputs();
+        calculatePreview();
+        renderHistory();
+    </script>
+</body>
+</html>

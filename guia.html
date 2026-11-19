@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Uso & Bookmarklets - FTS15 Stats Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#E5BE53',
+                            goldHover: '#D4A838',
+                            goldLight: '#F3D77E',
+                            sky: '#81BBE6',
+                            skyLight: '#A8D3F2',
+                            blue: '#1653A3',
+                            blueDark: '#0F3C7A',
+                            black: '#0A0A0C',
+                            darkCard: '#121318',
+                            darkInput: '#181A20',
+                            darkBorder: '#262932'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #81BBE655;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #E5BE53;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-brand-black dark:text-slate-100 min-h-screen font-sans transition-colors duration-200 flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white dark:bg-brand-darkCard border-b border-slate-200 dark:border-brand-darkBorder py-3.5 px-6 shadow-sm sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-blue via-brand-sky to-brand-gold p-0.5 shadow-md shrink-0">
+                    <div class="w-full h-full rounded-full bg-white dark:bg-brand-black flex items-center justify-center font-black text-xs tracking-tighter text-brand-blue dark:text-brand-gold">
+                        PLS<span class="text-brand-sky">ARG</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg sm:text-xl font-bold tracking-tight text-brand-blue dark:text-brand-gold">Guía Oficial & Bookmarklets</h1>
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-brand-sky/20 text-brand-blue dark:text-brand-sky border border-brand-sky/30">
+                            FTS15 Converter
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Manual paso a paso + Scripts de extracción automática para Microsoft Edge</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="toggleTheme()" id="themeToggleBtn"
+                    class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-brand-darkInput dark:hover:bg-slate-800 text-slate-700 dark:text-brand-gold text-xs font-semibold py-2 px-3 rounded-lg border border-slate-300 dark:border-brand-darkBorder transition">
+                    <span id="themeIcon">☀️</span>
+                    <span id="themeLabel">Tema Claro</span>
+                </button>
+                <a href="index.html"
+                    class="bg-brand-blue hover:bg-brand-blueDark dark:bg-brand-gold dark:hover:bg-brand-goldHover text-white dark:text-brand-black text-xs font-bold py-2 px-3.5 rounded-lg shadow transition">
+                    ← Volver al Conversor
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-5xl w-full mx-auto p-6 space-y-6 flex-1">
+
+        <!-- Navegación rápida -->
+        <div class="bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Ir a sección:</span>
+            <div class="flex flex-wrap gap-2">
+                <a href="#paso-1" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-brand-sky/20 dark:bg-brand-darkInput dark:hover:bg-brand-gold/20 text-brand-blue dark:text-brand-sky transition">1. Flujo Manual</a>
+                <a href="#paso-2" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-brand-sky/20 dark:bg-brand-darkInput dark:hover:bg-brand-gold/20 text-brand-blue dark:text-brand-sky transition">2. Bookmarklets en Edge</a>
+                <a href="#paso-3" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-brand-sky/20 dark:bg-brand-darkInput dark:hover:bg-brand-gold/20 text-brand-blue dark:text-brand-sky transition">3. Importar Fichas</a>
+                <a href="#paso-4" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-brand-sky/20 dark:bg-brand-darkInput dark:hover:bg-brand-gold/20 text-brand-blue dark:text-brand-sky transition">4. Modos de Escala</a>
+            </div>
+        </div>
+
+        <!-- BLOQUE 1: Flujo rápido de 3 pasos -->
+        <section id="paso-1" class="bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-6 shadow-sm">
+            <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-slate-200 dark:border-brand-darkBorder">
+                <span class="w-7 h-7 rounded-lg bg-brand-blue/15 dark:bg-brand-gold/20 text-brand-blue dark:text-brand-gold font-extrabold text-sm flex items-center justify-center">1</span>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">Flujo Rápido de Conversión (3 Pasos)</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-50 dark:bg-brand-darkInput/80 border border-slate-200 dark:border-brand-darkBorder rounded-lg p-4">
+                    <div class="text-xs font-bold uppercase tracking-wider text-brand-blue dark:text-brand-gold mb-1">Paso A • Configurar</div>
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-1.5">Origen, Posición y Escala</h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Selecciona el juego de origen (<strong>FC27</strong>, <strong>eFootball 2027</strong>, <strong>PES 2021</strong> o <strong>Football Manager</strong>), la posición principal y el <strong>Modo de Escala</strong> deseado.
+                    </p>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-brand-darkInput/80 border border-slate-200 dark:border-brand-darkBorder rounded-lg p-4">
+                    <div class="text-xs font-bold uppercase tracking-wider text-brand-blue dark:text-brand-sky mb-1">Paso B • Organizar</div>
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-1.5">Rutas de Carpetas por Equipo</h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Asigna una carpeta separando niveles con <code class="text-brand-blue dark:text-brand-gold font-bold">/</code> (ej: <code class="text-[11px] bg-slate-200 dark:bg-brand-black px-1 py-0.5 rounded">Argentina/Primera/Boca Juniors</code>). Al guardar, la carpeta se mantiene activa para cargar rápido todo el plantel.
+                    </p>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-brand-darkInput/80 border border-slate-200 dark:border-brand-darkBorder rounded-lg p-4">
+                    <div class="text-xs font-bold uppercase tracking-wider text-brand-blue dark:text-brand-gold mb-1">Paso C • Exportar</div>
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-1.5">.TXT Individual o .ZIP Masivo</h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Descarga el archivo <code class="font-semibold">.txt</code> de cada jugador para pasarlo a <code class="font-semibold">players.dat</code>, o presiona <strong>.ZIP</strong> en cualquier carpeta para bajar todo el equipo ordenado.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- BLOQUE 2: Instalación de Bookmarklets en Microsoft Edge -->
+        <section id="paso-2" class="bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-6 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-200 dark:border-brand-darkBorder">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-7 h-7 rounded-lg bg-brand-blue/15 dark:bg-brand-gold/20 text-brand-blue dark:text-brand-gold font-extrabold text-sm flex items-center justify-center">2</span>
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white">Crear Bookmarklets en Microsoft Edge (Extracción en 1 Clic)</h2>
+                </div>
+                <span class="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-brand-sky/15 text-brand-blue dark:text-brand-sky border border-brand-sky/30">
+                    Recomendado para carga masiva
+                </span>
+            </div>
+
+            <p class="text-xs text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
+                Un <strong>bookmarklet</strong> es un marcador inteligente que ejecuta un pequeño script en la página del jugador que estés viendo (SoFIFA, eFootballHUB, PES Master o FMInside) y descarga automáticamente su ficha <code class="text-brand-blue dark:text-brand-gold font-semibold">.json</code> lista para importar al conversor sin tipear ningún número a mano.
+            </p>
+
+            <!-- Instrucciones paso a paso para Edge -->
+            <div class="bg-slate-50 dark:bg-brand-darkInput border border-slate-200 dark:border-brand-darkBorder rounded-lg p-4 mb-5">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-brand-blue dark:text-brand-gold mb-2.5">Cómo instalarlos en Microsoft Edge:</h3>
+                <ol class="list-decimal list-inside space-y-2 text-xs text-slate-700 dark:text-slate-200">
+                    <li>Abre Microsoft Edge y muestra la barra de favoritos presionando <kbd class="px-1.5 py-0.5 text-[11px] font-mono bg-white dark:bg-brand-black border border-slate-300 dark:border-brand-darkBorder rounded">Ctrl</kbd> + <kbd class="px-1.5 py-0.5 text-[11px] font-mono bg-white dark:bg-brand-black border border-slate-300 dark:border-brand-darkBorder rounded">Shift</kbd> + <kbd class="px-1.5 py-0.5 text-[11px] font-mono bg-white dark:bg-brand-black border border-slate-300 dark:border-brand-darkBorder rounded">B</kbd>.</li>
+                    <li>Haz <strong>clic derecho</strong> en un espacio vacío de la barra de favoritos y elige <strong>"Agregar página"</strong> (o <em>Agregar favorito</em>).</li>
+                    <li>En el campo <strong>Nombre</strong>, escribe un título corto (ej: <code class="text-brand-blue dark:text-brand-sky">Extraer FMInside</code>).</li>
+                    <li>En el campo <strong>URL</strong>, borra lo que haya, haz clic en <strong>"Copiar código"</strong> en la tarjeta correspondiente de abajo y pégalo (<kbd class="px-1.5 py-0.5 text-[11px] font-mono bg-white dark:bg-brand-black border border-slate-300 dark:border-brand-darkBorder rounded">Ctrl</kbd> + <kbd class="px-1.5 py-0.5 text-[11px] font-mono bg-white dark:bg-brand-black border border-slate-300 dark:border-brand-darkBorder rounded">V</kbd>). Asegúrate de que empiece exactamente con <code class="text-brand-blue dark:text-brand-gold font-bold">javascript:</code>.</li>
+                    <li>Haz clic en <strong>Guardar</strong>. Repite el proceso para cada web que utilices.</li>
+                </ol>
+            </div>
+
+            <!-- Tarjetas de Bookmarklets con botón de copiado -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <!-- 1. SoFIFA (FC27) -->
+                <div class="rounded-lg border border-slate-200 dark:border-brand-darkBorder bg-slate-50/70 dark:bg-brand-darkInput/60 p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="text-sm font-bold text-slate-900 dark:text-white">SoFIFA (FC 27 / EA FC)</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-blue/15 dark:bg-brand-gold/20 text-brand-blue dark:text-brand-gold">FC27</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-3">
+                            Extrae el nombre, posición y los 34 atributos de jugador/portero en español desde <strong>sofifa.com</strong>.
+                        </p>
+                    </div>
+                    <div>
+                        <textarea id="bm_sofifa" readonly rows="2" class="w-full font-mono text-[10px] bg-white dark:bg-brand-black text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-brand-darkBorder rounded p-2 mb-2 resize-none focus:outline-none">javascript:(function(){const map={"Centros":"centros","Definición":"definicion","Precisión cabeza":"cabeza","Pases cortos":"pases_cortos","Voleas":"voleas","Regates":"regates","Efecto":"efecto","Precisión faltas":"faltas","Pases largos":"pases_largos","Control del balón":"control","Aceleración":"aceleracion","Velocidad":"velocidad","Agilidad":"agilidad","Reflejos":"reflejos_mov","Equilibrio":"equilibrio","Potencia":"potencia_tiro","Salto":"salto","Resistencia":"resistencia","Fuerza":"fuerza","Tiros lejanos":"tiros_lejanos","Agresividad":"agresividad","Intercep.":"intercepciones","Pos. ataque":"pos_ataque","Visión":"vision","Penaltis":"penaltis","Compostura":"compostura","Conciencia def.":"conciencia_def","Robos":"robos","Entrada agresiva":"entrada_agresiva","Estirada":"gk_estirada","Paradas":"gk_paradas","Saques":"gk_saques","Colocación":"gk_colocacion"};const rawStats={};document.querySelectorAll('em[title]').forEach(em=>{const val=parseInt(em.getAttribute('title'),10);if(isNaN(val))return;const parentSpan=em.closest('span');const labelSpan=parentSpan?parentSpan.nextElementSibling:null;const label=labelSpan?labelSpan.textContent.trim():'';if(label==='Reflejos'&&rawStats.reflejos_mov!==undefined){rawStats.gk_reflejos=val;}else if(map[label]){rawStats[map[label]]=val;}});const h1=document.querySelector('h1');const name=h1?h1.textContent.trim():'Jugador_SoFIFA';const posEl=document.querySelector('.pos');const posCode=posEl?posEl.textContent.trim():'';let pos='Delantero (DC/ED/EI)';if(posCode==='POR')pos='Arquero (POR)';else if(['DFC','LD','LI','CAD','CAI'].includes(posCode))pos='Defensor (DFC/LD/LI)';else if(['MCD','MC','MCO','MD','MI'].includes(posCode))pos='Mediocampista (MC/MCO/MCD)';const data={name,pos,source:'FC27',version:'SoFIFA',rawStats};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${name.replace(/[\\/:*?"<>|]/g,'_')}_SoFIFA.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);})();</textarea>
+                        <button type="button" onclick="copyBookmarklet('bm_sofifa', this)"
+                            class="w-full bg-brand-blue hover:bg-brand-blueDark dark:bg-brand-gold dark:hover:bg-brand-goldHover text-white dark:text-brand-black text-xs font-bold py-2 px-3 rounded-lg transition">
+                            📋 Copiar código SoFIFA
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. FMInside (Football Manager) -->
+                <div class="rounded-lg border border-slate-200 dark:border-brand-darkBorder bg-slate-50/70 dark:bg-brand-darkInput/60 p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="text-sm font-bold text-slate-900 dark:text-white">FMInside (Football Manager)</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-blue/15 dark:bg-brand-gold/20 text-brand-blue dark:text-brand-gold">FM</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-3">
+                            Extrae los atributos técnicos, mentales, físicos y de portero en escala 0-99 desde <strong>fminside.net</strong>.
+                        </p>
+                    </div>
+                    <div>
+                        <textarea id="bm_fm" readonly rows="2" class="w-full font-mono text-[10px] bg-white dark:bg-brand-black text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-brand-darkBorder rounded p-2 mb-2 resize-none focus:outline-none">javascript:(function(){const nameEl=document.querySelector('.player-hero-heading h1');if(!nameEl){alert('No se detectó una ficha de jugador de FMInside.');return;}const name=nameEl.textContent.trim();const clubEl=document.querySelector('.player-hero-eyebrow a[href*="/clubs/"] span');const nationEl=document.querySelector('.player-hero-eyebrow a[href*="/players/"] span');const eyebrowSpans=Array.from(document.querySelectorAll('.player-hero-eyebrow > span')).filter(s=>s.textContent.trim()!=='·');const club=clubEl?clubEl.textContent.trim():'';const nation=nationEl?nationEl.textContent.trim():'';const rawPos=eyebrowSpans.length>0?eyebrowSpans[eyebrowSpans.length-1].textContent.trim().toUpperCase():'';let pos='Mediocampista (MC/MCO/MCD)';if(rawPos.includes('GK')){pos='Arquero (POR)';}else if(/^(D|WB)\s*\(|^D[CRL]?$|^WB[RL]$/.test(rawPos.split(',')[0].trim())){pos='Defensor (DFC/LD/LI)';}else if(/^(ST|AM\s*\([RL]\)|F\s*\()/.test(rawPos.split(',')[0].trim())){pos='Delantero (DC/ED/EI)';}const folder=[nation,club].filter(Boolean).join('/');const verStrong=document.querySelector('.player_version_summary strong');const version=verStrong?verStrong.textContent.replace(/\s+/g,' ').trim():'FMInside';const CODE_MAP={Cro:'crossing',Dri:'dribbling',Fin:'finishing',Fir:'first_touch',Hea:'heading',Lon:'long_shots',Mar:'marking',Pas:'passing',Tck:'tackling',Tec:'technique',Agg:'aggression',Ant:'anticipation',Bra:'bravery',Cmp:'composure',Cnt:'concentration',Dec:'decisions',Det:'determination',Fla:'flair',Ldr:'leadership',OtB:'off_the_ball',Pos:'positioning',Tea:'teamwork',Vis:'vision',Wor:'work_rate',Acc:'acceleration',Agi:'agility',Bal:'balance',Jum:'jumping_reach',Nat:'natural_fitness',Pac:'pace',Sta:'stamina',Str:'strength',Cor:'corners',Fre:'free_kick',LTh:'long_throws',Pen:'penalty_taking',Aer:'gk_aerial',Cmd:'gk_command',Com:'gk_comm',Ecc:'gk_eccentricity',Han:'gk_handling',Kic:'gk_kicking','1v1':'gk_one_on_ones',Pun:'gk_punching',Ref:'gk_reflexes',TRO:'gk_rushing',Thr:'gk_throwing'};const rawStats={};const isGK=pos==='Arquero (POR)';document.querySelectorAll('tr[data-profile-stat]').forEach(row=>{const code=row.getAttribute('data-profile-stat');const valCell=row.querySelector('.profile-stat-value');if(!code||!valCell)return;const numVal=parseInt(valCell.textContent.trim(),10)||0;if(isGK&&(code==='Fir'||code==='Pas'||code==='Tec')){if(code==='Fir')rawStats['gk_first_touch']=numVal;if(code==='Pas')rawStats['gk_passing']=numVal;if(code==='Tec')rawStats['gk_technique']=numVal;}else if(CODE_MAP[code]){rawStats[CODE_MAP[code]]=numVal;}});const payload={name,pos,folder,source:'FM',version,rawStats};const safeName=name.replace(/[\\/:*?"<>|]/g,'_');const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=safeName+'_FMInside.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);})();</textarea>
+                        <button type="button" onclick="copyBookmarklet('bm_fm', this)"
+                            class="w-full bg-brand-blue hover:bg-brand-blueDark dark:bg-brand-gold dark:hover:bg-brand-goldHover text-white dark:text-brand-black text-xs font-bold py-2 px-3 rounded-lg transition">
+                            📋 Copiar código FMInside
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. eFootballHUB -->
+                <div class="rounded-lg border border-slate-200 dark:border-brand-darkBorder bg-slate-50/70 dark:bg-brand-darkInput/60 p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="text-sm font-bold text-slate-900 dark:text-white">eFootballHUB (eFootball 2027)</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-sky/20 text-brand-blue dark:text-brand-sky">EFOOTBALL27</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-3">
+                            Captura nombre, posición, liga/club y stats en español desde la ficha del jugador en <strong>efootballhub.net</strong>.
+                        </p>
+                    </div>
+                    <div>
+                        <textarea id="bm_efootball" readonly rows="2" class="w-full font-mono text-[10px] bg-white dark:bg-brand-black text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-brand-darkBorder rounded p-2 mb-2 resize-none focus:outline-none">javascript:(function(){const h1=document.querySelector('h1');const cardName=document.querySelector('img[alt$=" player card"]');const name=h1?h1.textContent.trim():(cardName?cardName.alt.replace(/\s*player card$/i,'').trim():'');if(!name){alert('No se detectó una ficha de jugador en eFootballHUB.');return;}const posSpan=Array.from(document.querySelectorAll('span')).find(s=>/^(PT|GK|DFC|CB|LD|RB|LI|LB|MCD|DMF|MC|CMF|MCO|AMF|MD|RMF|MI|LMF|ED|RWF|EI|LWF|SD|SS|DC|CF)$/.test(s.textContent.trim())&&s.style.fontSize==='20px');const rawPos=posSpan?posSpan.textContent.trim().toUpperCase():'';let pos='Mediocampista (MC/MCO/MCD)';if(rawPos==='PT'||rawPos==='GK'){pos='Arquero (POR)';}else if(/^(DFC|CB|LD|RB|LI|LB)$/.test(rawPos)){pos='Defensor (DFC/LD/LI)';}else if(/^(ED|RWF|EI|LWF|SD|SS|DC|CF)$/.test(rawPos)){pos='Delantero (DC/ED/EI)';}const clubEl=document.querySelector('div[title] img[src*="/Emblem/"]');const leagueEl=document.querySelector('div[title] img[src*="/EmblemLC/"]');const club=clubEl&&clubEl.parentElement?clubEl.parentElement.getAttribute('title').trim():'';const league=leagueEl&&leagueEl.parentElement?leagueEl.parentElement.getAttribute('title').trim():'';const folder=[league,club].filter(Boolean).join('/');const LABEL_MAP={'Actitud ofensiva':'actitud_ofensiva','Control de balón':'control_balon','Regate':'regate','Conservación del balón':'conservacion','Pase raso':'pase_raso','Pase bombeado':'pase_bombeado','Finalización':'finalizacion','Cabeceo':'cabeceo','Balón parado':'balon_parado','Efecto':'efecto','Actitud defensiva':'actitud_defensiva','Compromiso defensivo':'compromiso_defensivo','Entrada':'entrada','Agresividad':'agresividad','Actitud de portero':'gk_actitud','Atajar (PT)':'gk_atajar','Desviar (PT)':'gk_desviar','Reflejos (PT)':'gk_reflejos','Cobertura (PT)':'gk_cobertura','Velocidad':'velocidad','Aceleración':'aceleracion','Potencia de tiro':'potencia_tiro','Salto':'salto','Contacto físico':'contacto_fisico','Equilibrio':'equilibrio','Resistencia':'resistencia'};const rawStats={};document.querySelectorAll('div.relative.flex.items-center.justify-between').forEach(row=>{const labelEl=row.querySelector('span.truncate');if(!labelEl)return;const key=LABEL_MAP[labelEl.textContent.trim()];if(!key)return;const valSpans=row.querySelectorAll('div span.tabular-nums');if(valSpans.length===0)return;const numVal=parseInt(valSpans[valSpans.length-1].textContent.trim(),10);if(!isNaN(numVal))rawStats[key]=numVal;});const payload={name,pos,folder,source:'EFOOTBALL27',version:'eFootball 2027',rawStats};const safeName=name.replace(/[\\/:*?"<>|]/g,'_');const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=safeName+'_eFootballHUB.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);})();</textarea>
+                        <button type="button" onclick="copyBookmarklet('bm_efootball', this)"
+                            class="w-full bg-brand-blue hover:bg-brand-blueDark dark:bg-brand-gold dark:hover:bg-brand-goldHover text-white dark:text-brand-black text-xs font-bold py-2 px-3 rounded-lg transition">
+                            📋 Copiar código eFootballHUB
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. PES Master (PES 2021) -->
+                <div class="rounded-lg border border-slate-200 dark:border-brand-darkBorder bg-slate-50/70 dark:bg-brand-darkInput/60 p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="text-sm font-bold text-slate-900 dark:text-white">PES Master (PES 2021)</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-sky/20 text-brand-blue dark:text-brand-sky">PES2021</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-3">
+                            Extrae los atributos clásicos de PES 2021 desde la base de datos de <strong>pesmaster.com</strong>.
+                        </p>
+                    </div>
+                    <div>
+                        <textarea id="bm_pes" readonly rows="2" class="w-full font-mono text-[10px] bg-white dark:bg-brand-black text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-brand-darkBorder rounded p-2 mb-2 resize-none focus:outline-none">javascript:(function(){const map={"Offensive Awareness":"actitud_ofensiva","Ball Control":"control_balon","Dribbling":"regate","Tight Possession":"conservacion","Low Pass":"pase_raso","Lofted Pass":"pase_bombeado","Finishing":"finalizacion","Heading":"cabeceo","Place Kicking":"balon_parado","Curl":"efecto","Speed":"velocidad","Acceleration":"aceleracion","Kicking Power":"potencia_tiro","Jump":"salto","Physical Contact":"contacto_fisico","Balance":"equilibrio","Stamina":"resistencia","Defensive Awareness":"actitud_defensiva","Ball Winning":"recuperacion","Aggression":"agresividad","GK Awareness":"gk_actitud","GK Catching":"gk_atajar","GK Clearing":"gk_despejar","GK Reflexes":"gk_reflejos","GK Reach":"gk_cobertura"};const rawStats={};document.querySelectorAll('tr').forEach(tr=>{const tds=tr.querySelectorAll('td');if(tds.length>=2){const lbl=tds[0].innerText.trim();const val=parseInt(tds[1].innerText.trim(),10);if(map[lbl]&&!isNaN(val))rawStats[map[lbl]]=val;}});const name=(document.querySelector('h1')?.innerText||'Jugador_PES2021').trim();const blob=new Blob([JSON.stringify({name,source:"PES2021",version:"PESMaster",rawStats},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name.replace(/[\\/:*?"<>|]/g,'_')+'_PES2021.json';a.click();})();</textarea>
+                        <button type="button" onclick="copyBookmarklet('bm_pes', this)"
+                            class="w-full bg-brand-blue hover:bg-brand-blueDark dark:bg-brand-gold dark:hover:bg-brand-goldHover text-white dark:text-brand-black text-xs font-bold py-2 px-3 rounded-lg transition">
+                            📋 Copiar código PES Master
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- BLOQUE 3 & 4: Importación de Fichas y Modos de Escala -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Bloque 3 -->
+            <section id="paso-3" class="bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-6 shadow-sm">
+                <div class="flex items-center gap-2.5 mb-3 pb-2.5 border-b border-slate-200 dark:border-brand-darkBorder">
+                    <span class="w-7 h-7 rounded-lg bg-brand-blue/15 dark:bg-brand-gold/20 text-brand-blue dark:text-brand-gold font-extrabold text-sm flex items-center justify-center">3</span>
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Cómo Importar la Ficha al Conversor</h2>
+                </div>
+                <ul class="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <li class="flex items-start gap-2">
+                        <span class="text-brand-blue dark:text-brand-gold font-bold">•</span>
+                        <span>Al hacer clic en tu marcador de Edge estando dentro de la ficha de un jugador, el navegador descargará automáticamente un archivo <code class="text-brand-blue dark:text-brand-sky font-semibold">NombreJugador.json</code>.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-brand-blue dark:text-brand-gold font-bold">•</span>
+                        <span>Ve al conversor y haz clic en el botón superior <strong>"Importar Ficha (.json)"</strong>.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-brand-blue dark:text-brand-gold font-bold">•</span>
+                        <span>El formulario completará al instante el nombre, la fuente y los 30+ atributos. Solo verifica la <strong>Posición Principal</strong> (Arquero o jugador de campo), elige la carpeta del equipo y guarda.</span>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Bloque 4 -->
+            <section id="paso-4" class="bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-6 shadow-sm">
+                <div class="flex items-center gap-2.5 mb-3 pb-2.5 border-b border-slate-200 dark:border-brand-darkBorder">
+                    <span class="w-7 h-7 rounded-lg bg-brand-blue/15 dark:bg-brand-gold/20 text-brand-blue dark:text-brand-gold font-extrabold text-sm flex items-center justify-center">4</span>
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">¿Qué Modo de Escala Elegir?</h2>
+                </div>
+                <div class="space-y-3 text-xs leading-relaxed">
+                    <div class="p-3 rounded-lg bg-slate-50 dark:bg-brand-darkInput border border-slate-200 dark:border-brand-darkBorder">
+                        <div class="font-bold text-slate-900 dark:text-brand-sky mb-0.5">Simulación Realista (Puro)</div>
+                        <p class="text-slate-600 dark:text-slate-300">
+                            Traduce los atributos sin inflación. Como el motor interno de FTS15 es más exigente que los juegos modernos, la media verde en pantalla suele verse 3 a 5 puntos por debajo de FC27/FM, pero mantiene las proporciones puras en cancha.
+                        </p>
+                    </div>
+                    <div class="p-3 rounded-lg bg-slate-50 dark:bg-brand-darkInput border border-brand-gold/40">
+                        <div class="font-bold text-brand-blue dark:text-brand-gold mb-0.5">Media Equivalente (FTS15 +) ★ Recomendado</div>
+                        <p class="text-slate-600 dark:text-slate-300">
+                            Compensa los pesos internos de FTS15 (incluyendo un ajuste especial de piso físico para jugadores técnicos de <strong>Football Manager</strong>) para que el <strong>Global</strong> que calcula FTS15 coincida exactamente con la media de la carta original.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        function initTheme() {
+            const savedTheme = localStorage.getItem('fts15_theme') || 'dark';
+            const htmlEl = document.documentElement;
+            if (savedTheme === 'dark') {
+                htmlEl.classList.add('dark');
+                updateThemeButton(true);
+            } else {
+                htmlEl.classList.remove('dark');
+                updateThemeButton(false);
+            }
+        }
+
+        function toggleTheme() {
+            const htmlEl = document.documentElement;
+            const isDark = htmlEl.classList.toggle('dark');
+            localStorage.setItem('fts15_theme', isDark ? 'dark' : 'light');
+            updateThemeButton(isDark);
+        }
+
+        function updateThemeButton(isDark) {
+            document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+            document.getElementById('themeLabel').textContent = isDark ? 'Tema Claro' : 'Tema Oscuro';
+        }
+
+        function copyBookmarklet(textareaId, btnEl) {
+            const textarea = document.getElementById(textareaId);
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                const originalText = btnEl.textContent;
+                btnEl.textContent = '✅ ¡Código copiado! Pégalo en Edge';
+                setTimeout(() => {
+                    btnEl.textContent = originalText;
+                }, 2200);
+            });
+        }
+
+        initTheme();
+    </script>
+</body>
+</html>
