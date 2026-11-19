@@ -3,7 +3,7 @@
 Herramienta web gratuita diseñada para modders de **First Touch Soccer 15 (FTS15)** que permite convertir atributos de jugadores desde bases de datos modernas hacia el formato exacto de FTS15 (`players.dat` / `.txt`).
 
 ### 🌐 Usar la herramienta online
-👉 **[Abrir FTS15 Stats Converter](https://github.com/dantebatista52/fts-15-stats-converter)**  
+👉 **[Abrir FTS15 Stats Converter](https://dantebatista52.github.io/fts-15-stats-converter/index.html)**  
 📖 **[Ver Guía de Uso y Bookmarklets](https://dantebatista52.github.io/fts-15-stats-converter/guia.html)**
 
 ---
