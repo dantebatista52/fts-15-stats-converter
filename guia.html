@@ -64,7 +64,7 @@
                             FTS15 Converter
                         </span>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Manual paso a paso + Scripts de extracción automática para Microsoft Edge</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Manual paso a paso + Scripts de extracción automática para navegadores (Microsoft Edge Recomendado)</p>
                 </div>
             </div>
 
@@ -325,7 +325,7 @@
             textarea.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(textarea.value).then(() => {
                 const originalText = btnEl.textContent;
-                btnEl.textContent = '✅ ¡Código copiado! Pégalo en Edge';
+                btnEl.textContent = '✅ ¡Código copiado!';
                 setTimeout(() => {
                     btnEl.textContent = originalText;
                 }, 2200);
