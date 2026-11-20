@@ -50,7 +50,7 @@
 
     <!-- Header -->
     <header class="bg-white dark:bg-brand-darkCard border-b border-slate-200 dark:border-brand-darkBorder py-3.5 px-6 shadow-sm sticky top-0 z-30">
-        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-blue via-brand-sky to-brand-gold p-0.5 shadow-md shrink-0">
                     <div class="w-full h-full rounded-full bg-white dark:bg-brand-black flex items-center justify-center font-black text-xs tracking-tighter text-brand-blue dark:text-brand-gold">
@@ -82,8 +82,11 @@
         </div>
     </header>
 
-    <!-- Contenido Principal -->
-    <main class="max-w-5xl w-full mx-auto p-6 space-y-6 flex-1">
+    <!-- Contenido Principal con Barra Lateral -->
+    <div class="max-w-7xl w-full mx-auto p-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Columna Principal (8 columnas en desktop) -->
+        <main class="lg:col-span-8 space-y-6">
 
         <!-- Navegación rápida -->
         <div class="bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
@@ -390,7 +393,69 @@
             </section>
 
         </div>
-    </main>
+        </main>
+
+        <!-- Barra Lateral: Herramientas para editar players.dat (4 columnas en desktop) -->
+        <aside class="lg:col-span-4 space-y-4 lg:sticky lg:top-24">
+            <div class="bg-white dark:bg-brand-darkCard rounded-xl border border-slate-200 dark:border-brand-darkBorder p-5 shadow-sm">
+                <div class="flex items-center gap-2 mb-3 pb-2.5 border-b border-slate-200 dark:border-brand-darkBorder">
+                    <span class="text-base">🛠️</span>
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-900 dark:text-white leading-tight">Editores de <code class="text-brand-blue dark:text-brand-gold">players.dat</code></h2>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Herramientas recomendadas para aplicar tus stats</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    <!-- 1. DroiEditor -->
+                    <a href="https://play.google.com/store/apps/details?id=com.droicer.droiEditor&hl=es_AR&pli=1" target="_blank" rel="noopener noreferrer"
+                        class="block p-3.5 rounded-lg bg-slate-50 hover:bg-brand-sky/10 dark:bg-brand-darkInput dark:hover:bg-brand-gold/10 border border-slate-200 dark:border-brand-darkBorder hover:border-brand-blue dark:hover:border-brand-gold transition group">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="font-bold text-slate-900 dark:text-white group-hover:text-brand-blue dark:group-hover:text-brand-gold transition">DroiEditor</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">Android</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed mb-2">
+                            Aplicación para editar el archivo <code class="font-semibold">players.dat</code> directamente desde tu celular Android.
+                        </p>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-brand-blue dark:text-brand-sky">
+                            Abrir en Google Play ↗
+                        </span>
+                    </a>
+
+                    <!-- 2. Editor online de Droicer -->
+                    <a href="https://droicer.github.io/fts/index_P.html" target="_blank" rel="noopener noreferrer"
+                        class="block p-3.5 rounded-lg bg-slate-50 hover:bg-brand-sky/10 dark:bg-brand-darkInput dark:hover:bg-brand-gold/10 border border-slate-200 dark:border-brand-darkBorder hover:border-brand-blue dark:hover:border-brand-gold transition group">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="font-bold text-slate-900 dark:text-white group-hover:text-brand-blue dark:group-hover:text-brand-gold transition">Editor Online (Droicer)</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-sky/20 text-brand-blue dark:text-brand-sky border border-brand-sky/30">Android & PC</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed mb-2">
+                            Editor web hecho por <strong>Droicer</strong> para modificar <code class="font-semibold">players.dat</code> desde el navegador sin instalar programas.
+                        </p>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-brand-blue dark:text-brand-sky">
+                            Ir al Editor Web ↗
+                        </span>
+                    </a>
+
+                    <!-- 3. Herramientas de FTS LMX -->
+                    <a href="https://drive.google.com/file/d/1GsLzD5OG0Q1hnmZRH9ql68LifLJ5X6sI/view?usp=drive_link" target="_blank" rel="noopener noreferrer"
+                        class="block p-3.5 rounded-lg bg-slate-50 hover:bg-brand-sky/10 dark:bg-brand-darkInput dark:hover:bg-brand-gold/10 border border-slate-200 dark:border-brand-darkBorder hover:border-brand-blue dark:hover:border-brand-gold transition group">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="font-bold text-slate-900 dark:text-white group-hover:text-brand-blue dark:group-hover:text-brand-gold transition">Herramientas FTS LMX</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-blue/15 dark:bg-brand-gold/20 text-brand-blue dark:text-brand-gold border border-brand-blue/30 dark:border-brand-gold/30">Solo PC</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed mb-2">
+                            Paquete de utilidades de escritorio para editar bases de datos y archivos de FTS15 en computadora.
+                        </p>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-brand-blue dark:text-brand-sky">
+                            Descargar en Google Drive ↗
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+    </div>
 
     <script>
         function initTheme() {
